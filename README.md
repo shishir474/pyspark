@@ -37,5 +37,7 @@ getData() to fetch COVID-19 data from the API and store it in jsonResponse.
 cleanData() to clean the retrieved JSON data and store it in data.
 createDf() to create a PySpark DataFrame from the cleaned data and store it in df.
 
+
 #app.py
+
 In app.py created a Flask app and inside it created the routes for all the queries used in demo.py and retured the output in json format.
