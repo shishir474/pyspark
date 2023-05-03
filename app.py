@@ -3,18 +3,29 @@ from demo import df, spark  # Importing necessary modules and variables
 
 app = Flask(__name__)  # Creating a Flask web application instance
 
-@app.route('/')  # Defining the home route
-def home():
-    return jsonify({
-        '/most_affected_state': "Most affected state among all the states ( total death/total covid cases)",
-        '/least_affected_state': "Least affected state among all the states ( total death/total covid cases)",
-        '/highest_covid_cases': "State with highest covid cases.",
-        '/least_covid_cases': "State with least covid cases.",
-        '/total_cases': "Total cases.",
-        '/most_efficient_state': "State that handled the covid most efficiently( total recovery/ total covid cases).",
-        '/least_efficient_state': "State that handled the covid least efficiently( total recovery/ total covid cases).",
-        '/show_all_data': "Show all data"
-    })  # Returning a JSON response with information about available routes
+@app.route('/')
+def covid_cases():
+    return """
+                You can know about the Covid cases in India by visiting the below urls
+                <br>
+                <br>
+                <a href='/ShowMostAffectedState'>Most affected state</a>
+                <br>
+                <a href='/LeastAffectedState'>Least affected state</a>
+                <br>
+                <a href='/StateWithMaxCovidCases'>State with highest covid cases</a>
+                <br>
+                <a href='/StateWithMinCovidCases'>State with least covid cases</a>
+                <br>
+                <a href='/GetTotalCases'>Total covid cases in India</a>
+                <br>
+                <a href='/GetMostEfficientState'>State that handled the covid most efficiently</a>
+                <br>
+                <a href='/GetLeastEfficientState'>State that handled the covid least efficiently</a>
+                <br>
+                <a href='/show_all_data'>Detail information state wise</a>
+    """
+
 
 df.createOrReplaceTempView('table')  # Creating a temporary view of the DataFrame as 'table'
 
@@ -29,7 +40,7 @@ def getMostAffectedState():
 def getLeastAffectedState():
     ans = spark.sql('SELECT State, Confirm/Death as ans FROM table ORDER BY ans limit 1').select('State').collect()[0][0]
     return jsonify({
-        'most_affected_state': ans
+        'least_affected_state': ans
     })  # Returning a JSON response with the least affected state
 
 @app.route('/StateWithMaxCovidCases')  # Defining a route to get the state with maximum COVID cases
@@ -67,7 +78,25 @@ def getLeastEfficientState():
         'Least_efficienct_state': ans
     })
 
-
+# route for detail covid information state wise    
+@app.route('/show_all_data', methods=['GET'])
+def get_covid_cases():
+    tmp = df.collect()
+    res=  list()
+    for i in tmp:
+        d = {
+            'Slno': i[0],
+            'State':i[1],
+            'Confirm':i[2],
+            'Cured':i[3],
+            'Death':i[4],
+            'Total':i[5]
+        }
+        res.append(d)
+    
+    return res
+    
+    
 if(__name__ == '__main__'):
     app.run(host='0.0.0.0',port=8001)
 
