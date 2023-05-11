@@ -31,14 +31,14 @@ df.createOrReplaceTempView('table')  # Creating a temporary view of the DataFram
 
 @app.route('/ShowMostAffectedState')  # Defining a route to get the most affected state
 def getMostAffectedState():
-    ans = spark.sql('SELECT State, Confirm/Death as ans FROM table ORDER BY ans DESC LIMIT 1').select('State').collect()[0][0]
+    ans = spark.sql('SELECT State, Death/Total as ans FROM table ORDER BY ans DESC LIMIT 1').select('State').collect()[0][0]
     return jsonify({
         'most_affected_state': ans
     })  # Returning a JSON response with the most affected state
 
 @app.route('/LeastAffectedState')  # Defining a route to get the least affected state
 def getLeastAffectedState():
-    ans = spark.sql('SELECT State, Confirm/Death as ans FROM table ORDER BY ans limit 1').select('State').collect()[0][0]
+    ans = spark.sql('SELECT State, Death/Total as ans FROM table ORDER BY ans limit 1').select('State').collect()[0][0]
     return jsonify({
         'least_affected_state': ans
     })  # Returning a JSON response with the least affected state
@@ -59,7 +59,7 @@ def getStateWithMinCovidCases():
 
 @app.route('/GetTotalCases')  # Defining a route to get the total COVID cases
 def getTotalCases():
-    ans = spark.sql("SELECT SUM(Confirm) as Total_cases FROM table").collect()[0][0]
+    ans = spark.sql("SELECT SUM(Total) as Total_cases FROM table").collect()[0][0]
     return jsonify({
         'Total_cases': ans
     })  # Returning a JSON response with the total COVID cases
